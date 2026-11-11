@@ -58,14 +58,6 @@
   .l.soon{border-style:dashed;cursor:default}
   .l.soon small{color:var(--accent)}
 
-  /* —— visuals gallery —— */
-  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-  @media (min-width:700px){.grid{grid-template-columns:repeat(3,1fr);gap:14px}}
-  figure{position:relative;aspect-ratio:1;overflow:hidden;border:1px solid var(--line);background:#000}
-  figure video,figure img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-  figcaption{position:absolute;left:0;right:0;bottom:0;padding:1.6rem .7rem .55rem;
-    font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;color:var(--ink);
-    background:linear-gradient(transparent,rgba(0,0,0,.75))}
 
   footer{font-family:var(--mono);font-size:.7rem;color:var(--mute)}
   @media (prefers-reduced-motion:reduce){a.l{transition:none}}
@@ -73,7 +65,7 @@
 </head>
 <body>
 <div class="bg" aria-hidden="true">
-  <video id="bgv" src="assets/video/07.mp4" poster="assets/poster/07.jpg" muted loop playsinline preload="metadata"></video>
+  <video id="bgv" src="assets/video/07.mp4" poster="assets/poster/07.jpg" muted loop playsinline autoplay preload="auto"></video>
 </div>
 <div class="veil"></div>
 
@@ -89,18 +81,6 @@
     <p class="sub">Things I've made that you can download or buy.</p>
     <div class="list">
       <div class="l soon"><b>BlackSphere</b><small>coming soon</small></div>
-    </div>
-  </section>
-
-  <section aria-labelledby="visuals">
-    <h2 id="visuals">Visuals</h2>
-    <div class="grid" id="grid">
-      <figure><video src="assets/video/02.mp4" poster="assets/poster/02.jpg" muted loop playsinline preload="none"></video><figcaption>No. 01</figcaption></figure>
-      <figure><video src="assets/video/03.mp4" poster="assets/poster/03.jpg" muted loop playsinline preload="none"></video><figcaption>No. 02</figcaption></figure>
-      <figure><video src="assets/video/01.mp4" poster="assets/poster/01.jpg" muted loop playsinline preload="none"></video><figcaption>No. 03</figcaption></figure>
-      <figure><video src="assets/video/04.mp4" poster="assets/poster/04.jpg" muted loop playsinline preload="none"></video><figcaption>No. 04</figcaption></figure>
-      <figure><video src="assets/video/05.mp4" poster="assets/poster/05.jpg" muted loop playsinline preload="none"></video><figcaption>No. 05</figcaption></figure>
-      <figure><video src="assets/video/07.mp4" poster="assets/poster/07.jpg" muted loop playsinline preload="none"></video><figcaption>No. 06</figcaption></figure>
     </div>
   </section>
 
@@ -150,18 +130,19 @@ function drawLogo(tt){
 (function loop(){ drawLogo(performance.now()/1000); if (!reduce) requestAnimationFrame(loop); })();
 addEventListener('resize', () => drawLogo(performance.now()/1000));
 
-// —— Video: play only while on screen; hold still frames for reduced motion ——
-const vids = [document.getElementById('bgv'), ...document.querySelectorAll('#grid video')];
+// —— Background video: autoplay can be blocked (Low Power Mode, data saver), so retry on
+// load and on the first interaction. Reduced-motion visitors get the still poster instead. ——
+const bgv = document.getElementById('bgv');
+bgv.muted = true;
 if (reduce){
-  vids.forEach(v => { v.removeAttribute('src'); v.load(); });
+  bgv.removeAttribute('src'); bgv.load();
 } else {
-  const io = new IntersectionObserver(es => es.forEach(e => {
-    const v = e.target;
-    if (e.isIntersecting){ if (v.preload !== 'auto'){ v.preload = 'auto'; } v.play().catch(()=>{}); }
-    else v.pause();
-  }), {threshold: .25});
-  vids.forEach(v => io.observe(v));
-  document.addEventListener('visibilitychange', () => { if (document.hidden) vids.forEach(v => v.pause()); });
+  const tryPlay = () => bgv.play().catch(() => {});
+  bgv.addEventListener('loadeddata', tryPlay);
+  ['pointerdown','touchstart','keydown','scroll'].forEach(ev =>
+    addEventListener(ev, tryPlay, {once:true, passive:true}));
+  document.addEventListener('visibilitychange', () => document.hidden ? bgv.pause() : tryPlay());
+  tryPlay();
 }
 </script>
 </body>
