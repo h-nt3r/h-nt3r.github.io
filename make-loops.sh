@@ -6,17 +6,18 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"; FF="$ROOT/.tools/ffmpeg"
 SRC="$1"; shift
+# HQ=1 ./make-loops.sh ...  -> encode at the source clip's native resolution (for a hero/locked background)
 START=1.0     # skip the first second (TD warm-up)
 LEN=9.0       # seconds of source used; the final loop is 2x this
 for n in "$@"; do
   in="$SRC/website$n.mp4"; id=$(printf "%02d" "$n")
   read w h <<<"$("$FF" -hide_banner -i "$in" 2>&1 | grep -oE ', [0-9]{3,4}x[0-9]{3,4}' | head -1 | tr -d ', ' | tr 'x' ' ')"
-  if (( h > w )); then SCALE="scale=540:960"; else SCALE="scale=960:540"; fi
+  if [[ "${HQ:-0}" == "1" ]]; then SCALE="scale=$w:$h"; CRF=24; elif (( h > w )); then SCALE="scale=540:960"; CRF=27; else SCALE="scale=960:540"; CRF=27; fi
   t_end=$(printf "%.2f" $(( START + LEN )))
   "$FF" -hide_banner -loglevel error -y -i "$in" -filter_complex \
    "[0:v]trim=start=${START}:end=${t_end},setpts=PTS-STARTPTS,fps=30,${SCALE},split[a][b]; \
     [b]reverse[r]; [a][r]concat=n=2:v=1:a=0,format=yuv420p[v]" \
-   -map "[v]" -an -c:v libx264 -preset slow -crf 27 -movflags +faststart "$ROOT/assets/video/$id.mp4"
+   -map "[v]" -an -c:v libx264 -preset slow -crf $CRF -movflags +faststart "$ROOT/assets/video/$id.mp4"
   # poster = brightest sampled frame, so dark clips don't get a black thumbnail
   best=$("$FF" -hide_banner -i "$ROOT/assets/video/$id.mp4" -vf "fps=2,signalstats,metadata=print:key=lavfi.signal_stats.YAVG:file=-" -f null - 2>/dev/null \
     | awk -F'[: =]' '/pts_time/{for(i=1;i<=NF;i++) if($i=="pts_time") t=$(i+1)} /YAVG/{v=$NF+0; if(v>m){m=v;bt=t}} END{print bt+0}')
