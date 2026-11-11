@@ -32,10 +32,6 @@
   .bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none}
   .bg video.on{opacity:1}
   .bg.playing{background-image:none}
-  /* landscape + portrait clip: draw it full-height and mirror it across the width (see script) */
-  #bgc{position:absolute;inset:0;width:100%;height:100%;display:none;pointer-events:none}
-  .bg.mirror #bgc{display:block}
-  .bg.mirror video.on{opacity:0}
   /* never show a native play button or controls, even if autoplay is blocked */
   video::-webkit-media-controls,video::-webkit-media-controls-start-playback-button,
   video::-webkit-media-controls-overlay-play-button,video::-webkit-media-controls-panel{display:none!important;-webkit-appearance:none}
@@ -75,13 +71,14 @@
 <body>
 <div class="bg" aria-hidden="true">
   <video id="bgv" muted loop playsinline autoplay preload="auto" disablepictureinpicture disableremoteplayback tabindex="-1"></video>
-  <canvas id="bgc"></canvas>
 </div>
 <script>
 // Background clip. Locked to one clip by default; see the feature flag below to rotate.
 (function(){
   const CLIPS = {
-    '01':{portrait:true},  '04':{portrait:true},
+    // portrait:true = the base file is a tall render. wide:true = a landscape version also exists as NN-wide.mp4
+    // (used on landscape screens, so tall renders aren't cropped and blown up on desktop).
+    '01':{portrait:true,  wide:false}, '04':{portrait:true,  wide:false},
     '02':{portrait:false}, '03':{portrait:false},
     '05':{portrait:false}, '07':{portrait:false}
   };
@@ -104,10 +101,12 @@
   } else {
     id = CONFIG.locked;
   }
-  const VER = '4'; // bump when clips are re-rendered so browsers don't serve stale cached files
+  const VER = '5'; // bump when clips are re-rendered so browsers don't serve stale cached files
   const bg = document.querySelector('.bg'), v = document.getElementById('bgv');
-  bg.style.backgroundImage = 'url(assets/poster/' + id + '.jpg?v=' + VER + ')';
-  v.src = 'assets/video/' + id + '.mp4?v=' + VER;
+  const useWide = innerWidth > innerHeight && CLIPS[id].wide;
+  const name = id + (useWide ? '-wide' : '');
+  bg.style.backgroundImage = 'url(assets/poster/' + name + '.jpg?v=' + VER + ')';
+  v.src = 'assets/video/' + name + '.mp4?v=' + VER;
   window.__bgId = id;
 })();
 </script>
@@ -191,28 +190,6 @@ if (reduce){
   tryPlay();
 }
 
-// —— Landscape screens + a portrait clip: full-height tiles, mirrored left/right so edges always match ——
-const LANDSCAPE_MIRROR = true;   // false → fall back to stretching the clip to fill the screen (crops + enlarges it)
-const bgc = document.getElementById('bgc'), cx = bgc.getContext('2d'), bgEl = bgv.parentElement;
-function mirrorFrame(){
-  const wide = innerWidth > innerHeight, portraitClip = bgv.videoHeight > bgv.videoWidth;
-  const on = LANDSCAPE_MIRROR && wide && portraitClip && !bgv.paused && bgv.readyState >= 2;
-  bgEl.classList.toggle('mirror', on);
-  if (on){
-    const d = Math.min(devicePixelRatio || 1, 1.5), W = Math.round(innerWidth*d), H = Math.round(innerHeight*d);
-    if (bgc.width !== W || bgc.height !== H){ bgc.width = W; bgc.height = H; }
-    const tw = bgv.videoWidth * (H / bgv.videoHeight), n = Math.ceil(W / tw / 2) + 1;
-    for (let i = -n; i <= n; i++){
-      const x = W/2 - tw/2 + i*tw;
-      cx.save();
-      if (i % 2 !== 0){ cx.translate(x + tw, 0); cx.scale(-1, 1); cx.drawImage(bgv, 0, 0, tw, H); }
-      else cx.drawImage(bgv, x, 0, tw, H);
-      cx.restore();
-    }
-  }
-  requestAnimationFrame(mirrorFrame);
-}
-if (!reduce) mirrorFrame();
 </script>
 </body>
 </html>

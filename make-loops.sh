@@ -6,11 +6,14 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"; FF="$ROOT/.tools/ffmpeg"
 SRC="$1"; shift
+# SUFFIX=-wide ./make-loops.sh ...  -> writes NN-wide.mp4 / NN-wide.jpg (landscape version of a clip)
+SUFFIX="${SUFFIX:-}"
 # HQ=1 ./make-loops.sh ...  -> encode at the source clip's native resolution (for a hero/locked background)
 START=1.0     # skip the first second (TD warm-up)
 LEN=9.0       # seconds of source used; the final loop is 2x this
 for n in "$@"; do
-  in="$SRC/website$n.mp4"; id=$(printf "%02d" "$n")
+  if [[ -f "$n" ]]; then in="$n"; id="${CLIP_ID:?set CLIP_ID=01 when passing a file path}${SUFFIX}"   # e.g. CLIP_ID=01 SUFFIX=-wide ./make-loops.sh . ~/wide.mp4
+  else in="$SRC/website$n.mp4"; id=$(printf "%02d" "$n")${SUFFIX}; fi
   read w h <<<"$("$FF" -hide_banner -i "$in" 2>&1 | grep -oE ', [0-9]{3,4}x[0-9]{3,4}' | head -1 | tr -d ', ' | tr 'x' ' ')"
   if [[ "${HQ:-0}" == "1" ]]; then SCALE="scale=$w:$h"; CRF=24; elif (( h > w )); then SCALE="scale=540:960"; CRF=27; else SCALE="scale=960:540"; CRF=27; fi
   t_end=$(printf "%.2f" $(( START + LEN )))
