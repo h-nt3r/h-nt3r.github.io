@@ -27,8 +27,15 @@
   :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 
   /* —— background: the art itself, tinted to the accent —— */
-  .bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:#000}
-  .bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45}
+  .bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:#000 url(assets/poster/07.jpg) center/cover no-repeat}
+  .bg::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.55)} /* dims the still frame to match the video's opacity */
+  .bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s;pointer-events:none}
+  .bg video.on{opacity:.45}
+  .bg.playing{background-image:none}
+  .bg.playing::before{display:none}
+  /* never show a native play button or controls, even if autoplay is blocked */
+  video::-webkit-media-controls,video::-webkit-media-controls-start-playback-button,
+  video::-webkit-media-controls-overlay-play-button,video::-webkit-media-controls-panel{display:none!important;-webkit-appearance:none}
   .bg::after{content:"";position:absolute;inset:0;background:var(--accent);mix-blend-mode:multiply}
   .veil{position:fixed;inset:0;z-index:1;pointer-events:none;
     background:radial-gradient(ellipse at 50% 30%,rgba(8,8,8,.15) 0%,rgba(8,8,8,.7) 62%,rgba(8,8,8,.94) 100%)}
@@ -65,7 +72,7 @@
 </head>
 <body>
 <div class="bg" aria-hidden="true">
-  <video id="bgv" src="assets/video/07.mp4" poster="assets/poster/07.jpg" muted loop playsinline autoplay preload="auto"></video>
+  <video id="bgv" src="assets/video/07.mp4" muted loop playsinline autoplay preload="auto" disablepictureinpicture disableremoteplayback tabindex="-1"></video>
 </div>
 <div class="veil"></div>
 
@@ -137,6 +144,8 @@ bgv.muted = true;
 if (reduce){
   bgv.removeAttribute('src'); bgv.load();
 } else {
+  bgv.addEventListener('playing', () => { bgv.classList.add('on'); bgv.parentElement.classList.add('playing'); });
+  bgv.addEventListener('pause', () => { if (document.hidden) return; bgv.classList.remove('on'); bgv.parentElement.classList.remove('playing'); });
   const tryPlay = () => bgv.play().catch(() => {});
   bgv.addEventListener('loadeddata', tryPlay);
   ['pointerdown','touchstart','keydown','scroll'].forEach(ev =>
