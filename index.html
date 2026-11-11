@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>H_nt3r</title>
+<meta name="description" content="Hello, I like to make things with data.">
+<meta property="og:title" content="H_nt3r">
+<meta property="og:description" content="Hello, I like to make things with data.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#080808">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+  @font-face{font-family:"Bricolage";src:url(assets/fonts/bricolage-grotesque.woff2) format("woff2");font-weight:200 800;font-display:swap}
+  @font-face{font-family:"GeistMono";src:url(assets/fonts/geist-mono.woff2) format("woff2");font-weight:100 900;font-display:swap}
+  :root{
+    --bg:#080808; --ink:#ecf0ee; --mute:#8d9593; --line:rgba(236,240,238,.15);
+    --accent:#4fe3ff; --accent-rgb:79,227,255;
+    --mono:"GeistMono",ui-monospace,"SF Mono",Menlo,monospace;
+    --sans:"Bricolage",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0}
+  html{background:var(--bg);scroll-behavior:smooth}
+  body{font-family:var(--sans);color:var(--ink);background:var(--bg);min-height:100dvh;overflow-x:hidden}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+  /* —— background: the art itself, tinted to the accent —— */
+  .bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:#000}
+  .bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45}
+  .bg::after{content:"";position:absolute;inset:0;background:var(--accent);mix-blend-mode:multiply}
+  .veil{position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(ellipse at 50% 30%,rgba(8,8,8,.15) 0%,rgba(8,8,8,.7) 62%,rgba(8,8,8,.94) 100%)}
+
+  main{position:relative;z-index:2;max-width:1040px;margin:0 auto;padding:clamp(28px,8vh,96px) 16px 40px;
+    display:flex;flex-direction:column;gap:clamp(2.5rem,7vw,4.5rem)}
+  .col{width:100%;max-width:560px}
+
+  h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  #logo{display:block;width:100%;max-width:520px;aspect-ratio:35/5;image-rendering:pixelated}
+  .blurb{margin-top:1.25rem;font-size:clamp(1.15rem,3.6vw,1.45rem);line-height:1.4;max-width:30ch;letter-spacing:-.01em}
+
+  h2{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:500;margin-bottom:.9rem}
+  .sub{font-family:var(--mono);font-size:.72rem;color:var(--mute);margin:-.5rem 0 1rem;letter-spacing:.02em}
+
+  .list{display:flex;flex-direction:column;gap:.6rem}
+  a.l,.l.soon{
+    display:flex;justify-content:space-between;align-items:center;gap:1rem;
+    padding:1rem 1.1rem;border:1px solid var(--line);color:var(--ink);text-decoration:none;
+    background:rgba(8,8,8,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    transition:border-color .2s,transform .2s cubic-bezier(.2,.7,.2,1),background .2s;
+  }
+  .l b{font-weight:600;font-size:1.15rem;letter-spacing:-.015em}
+  .l small{font-family:var(--mono);font-size:.7rem;color:var(--mute);text-align:right}
+  a.l:hover,a.l:focus-visible{border-color:var(--accent);transform:translateX(4px);background:rgba(var(--accent-rgb),.09)}
+  a.l:hover small{color:var(--accent)}
+  .l.soon{border-style:dashed;cursor:default}
+  .l.soon small{color:var(--accent)}
+
+  /* —— visuals gallery —— */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media (min-width:700px){.grid{grid-template-columns:repeat(3,1fr);gap:14px}}
+  figure{position:relative;aspect-ratio:1;overflow:hidden;border:1px solid var(--line);background:#000}
+  figure video,figure img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  figcaption{position:absolute;left:0;right:0;bottom:0;padding:1.6rem .7rem .55rem;
+    font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;color:var(--ink);
+    background:linear-gradient(transparent,rgba(0,0,0,.75))}
+
+  footer{font-family:var(--mono);font-size:.7rem;color:var(--mute)}
+  @media (prefers-reduced-motion:reduce){a.l{transition:none}}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true">
+  <video id="bgv" src="assets/video/07.mp4" poster="assets/poster/07.jpg" muted loop playsinline preload="metadata"></video>
+</div>
+<div class="veil"></div>
+
+<main>
+  <header class="col">
+    <h1>H_nt3r</h1>
+    <canvas id="logo" aria-hidden="true"></canvas>
+    <p class="blurb">Hello, I like to make things with data.</p>
+  </header>
+
+  <section class="col" aria-labelledby="shop">
+    <h2 id="shop">Shop</h2>
+    <p class="sub">Things I've made that you can download or buy.</p>
+    <div class="list">
+      <div class="l soon"><b>BlackSphere</b><small>coming soon</small></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="visuals">
+    <h2 id="visuals">Visuals</h2>
+    <div class="grid" id="grid">
+      <figure><video src="assets/video/02.mp4" poster="assets/poster/02.jpg" muted loop playsinline preload="none"></video><figcaption>No. 01</figcaption></figure>
+      <figure><video src="assets/video/03.mp4" poster="assets/poster/03.jpg" muted loop playsinline preload="none"></video><figcaption>No. 02</figcaption></figure>
+      <figure><video src="assets/video/01.mp4" poster="assets/poster/01.jpg" muted loop playsinline preload="none"></video><figcaption>No. 03</figcaption></figure>
+      <figure><video src="assets/video/04.mp4" poster="assets/poster/04.jpg" muted loop playsinline preload="none"></video><figcaption>No. 04</figcaption></figure>
+      <figure><video src="assets/video/05.mp4" poster="assets/poster/05.jpg" muted loop playsinline preload="none"></video><figcaption>No. 05</figcaption></figure>
+      <figure><video src="assets/video/07.mp4" poster="assets/poster/07.jpg" muted loop playsinline preload="none"></video><figcaption>No. 06</figcaption></figure>
+    </div>
+  </section>
+
+  <nav class="col" aria-labelledby="elsewhere">
+    <h2 id="elsewhere">Elsewhere</h2>
+    <div class="list">
+      <a class="l" rel="me noopener" href="https://www.instagram.com/h__nt3r"><b>Instagram</b><small>@h__nt3r →</small></a>
+      <a class="l" rel="me noopener" href="https://www.tiktok.com/@h_nt3r_"><b>TikTok</b><small>@h_nt3r_ →</small></a>
+      <a class="l" rel="me noopener" href="https://youtube.com/@h_nt3rtv"><b>YouTube</b><small>@h_nt3rtv →</small></a>
+      <a class="l" rel="me noopener" href="https://github.com/hunterbeezley"><b>GitHub</b><small>code →</small></a>
+      <a class="l" rel="me noopener" href="https://www.linkedin.com/in/hunterbeezley"><b>LinkedIn</b><small>work →</small></a>
+    </div>
+  </nav>
+
+  <footer class="col">© 2026 H_nt3r</footer>
+</main>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// —— Pixel-block wordmark: 5x5 glyphs, vertical-band shading, slow shimmer ——
+const GLYPHS = {
+  H:['X...X','X...X','XXXXX','X...X','X...X'], _:['.....','.....','.....','.....','XXXXX'],
+  N:['X...X','XX..X','X.X.X','X..XX','X...X'], T:['XXXXX','..X..','..X..','..X..','..X..'],
+  3:['XXXX.','....X','.XXX.','....X','XXXX.'], R:['XXXX.','X...X','XXXX.','X..X.','X...X']
+};
+const cells = [];
+['H','_','N','T','3','R'].forEach((ch, gi) => GLYPHS[ch].forEach((row, y) => [...row].forEach((c, x) => {
+  if (c === 'X') cells.push({x: gi*6 + x, y, seed: Math.random()});
+})));
+const lg = document.getElementById('logo'), lx = lg.getContext('2d');
+const ACC = getComputedStyle(document.documentElement).getPropertyValue('--accent-rgb').trim();
+function drawLogo(tt){
+  const r = lg.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2);
+  const w = Math.round(r.width*d), h = Math.round(r.height*d);
+  if (lg.width !== w || lg.height !== h){ lg.width = w; lg.height = h; }
+  lx.clearRect(0,0,w,h);
+  const cs = w/35, gap = Math.max(1, Math.round(cs*.08));
+  for (const c of cells){
+    const band = .55 + .45*Math.abs(Math.sin((c.x*1.7 + 1)*1.3));
+    const shimmer = reduce ? 0 : .12*Math.sin(tt*1.3 + c.x*.6 + c.y*.9);
+    const glitch = (!reduce && Math.sin(tt*.7 + c.seed*40) > .985) ? -.35 : 0;
+    lx.fillStyle = `rgba(${ACC},${Math.max(.18, Math.min(1, band + shimmer + glitch))})`;
+    lx.fillRect(c.x*cs + gap/2, c.y*cs + gap/2, cs - gap, cs - gap);
+  }
+}
+(function loop(){ drawLogo(performance.now()/1000); if (!reduce) requestAnimationFrame(loop); })();
+addEventListener('resize', () => drawLogo(performance.now()/1000));
+
+// —— Video: play only while on screen; hold still frames for reduced motion ——
+const vids = [document.getElementById('bgv'), ...document.querySelectorAll('#grid video')];
+if (reduce){
+  vids.forEach(v => { v.removeAttribute('src'); v.load(); });
+} else {
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    const v = e.target;
+    if (e.isIntersecting){ if (v.preload !== 'auto'){ v.preload = 'auto'; } v.play().catch(()=>{}); }
+    else v.pause();
+  }), {threshold: .25});
+  vids.forEach(v => io.observe(v));
+  document.addEventListener('visibilitychange', () => { if (document.hidden) vids.forEach(v => v.pause()); });
+}
+</script>
+</body>
+</html>
