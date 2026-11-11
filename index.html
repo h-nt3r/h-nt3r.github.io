@@ -26,18 +26,16 @@
   body{font-family:var(--sans);color:var(--ink);background:var(--bg);min-height:100dvh;overflow-x:hidden}
   :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 
-  /* —— background: the art itself, tinted to the accent —— */
+  /* —— background: the art itself, in its own colors —— */
   .bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:#000 center/cover no-repeat}
   .bg::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.4)} /* dims the still frame while the video loads */
   .bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s;pointer-events:none}
-  .bg video.on{opacity:.7}
-  .bg.tint video.on{opacity:.45}
+  .bg video.on{opacity:.6}
   .bg.playing{background-image:none}
   .bg.playing::before{display:none}
   /* never show a native play button or controls, even if autoplay is blocked */
   video::-webkit-media-controls,video::-webkit-media-controls-start-playback-button,
   video::-webkit-media-controls-overlay-play-button,video::-webkit-media-controls-panel{display:none!important;-webkit-appearance:none}
-  .bg.tint::after{content:"";position:absolute;inset:0;background:var(--accent);mix-blend-mode:multiply}
   .veil{position:fixed;inset:0;z-index:1;pointer-events:none;
     background:radial-gradient(ellipse at 50% 30%,rgba(8,8,8,.15) 0%,rgba(8,8,8,.7) 62%,rgba(8,8,8,.94) 100%)}
 
@@ -76,13 +74,13 @@
   <video id="bgv" muted loop playsinline autoplay preload="auto" disablepictureinpicture disableremoteplayback tabindex="-1"></video>
 </div>
 <script>
-// Pick a different background clip each load. tint=true for grayscale clips (recolored to the accent);
-// colored clips keep their own colors. Portrait screens get portrait-friendly clips.
+// Pick a different background clip each load (never the same one twice in a row).
+// Portrait screens get portrait-friendly clips.
 (function(){
   const CLIPS = {
-    '01':{tint:true,  portrait:true},  '04':{tint:true,  portrait:true},
-    '02':{tint:false, portrait:false}, '03':{tint:false, portrait:false},
-    '05':{tint:false, portrait:false}, '07':{tint:true,  portrait:false}
+    '01':{portrait:true},  '04':{portrait:true},
+    '02':{portrait:false}, '03':{portrait:false},
+    '05':{portrait:false}, '07':{portrait:false}
   };
   const tall = innerHeight > innerWidth;
   const pool = Object.keys(CLIPS).filter(k => tall ? (CLIPS[k].portrait || k==='03' || k==='07') : !CLIPS[k].portrait);
@@ -92,7 +90,6 @@
   try { localStorage.setItem('bg', id); sessionStorage.setItem('bg', id); } catch(e){}
   const bg = document.querySelector('.bg'), v = document.getElementById('bgv');
   bg.style.backgroundImage = 'url(assets/poster/' + id + '.jpg)';
-  if (CLIPS[id].tint) bg.classList.add('tint');
   v.src = 'assets/video/' + id + '.mp4';
   window.__bgId = id;
 })();
