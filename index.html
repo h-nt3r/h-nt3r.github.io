@@ -28,11 +28,10 @@
 
   /* —— background: the art itself, in its own colors —— */
   .bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:#000 center/cover no-repeat}
-  .bg::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.4)} /* dims the still frame while the video loads */
-  .bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s;pointer-events:none}
-  .bg video.on{opacity:.6}
+  .bg::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.45);pointer-events:none} /* dims whatever is showing */
+  .bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none}
+  .bg video.on{opacity:1}
   .bg.playing{background-image:none}
-  .bg.playing::before{display:none}
   /* never show a native play button or controls, even if autoplay is blocked */
   video::-webkit-media-controls,video::-webkit-media-controls-start-playback-button,
   video::-webkit-media-controls-overlay-play-button,video::-webkit-media-controls-panel{display:none!important;-webkit-appearance:none}
@@ -88,9 +87,10 @@
   const choices = pool.filter(k => k !== last);
   const id = choices[Math.floor(Math.random() * choices.length)];
   try { localStorage.setItem('bg', id); sessionStorage.setItem('bg', id); } catch(e){}
+  const VER = '3'; // bump when clips are re-rendered so browsers don't serve stale cached files
   const bg = document.querySelector('.bg'), v = document.getElementById('bgv');
-  bg.style.backgroundImage = 'url(assets/poster/' + id + '.jpg)';
-  v.src = 'assets/video/' + id + '.mp4';
+  bg.style.backgroundImage = 'url(assets/poster/' + id + '.jpg?v=' + VER + ')';
+  v.src = 'assets/video/' + id + '.mp4?v=' + VER;
   window.__bgId = id;
 })();
 </script>
