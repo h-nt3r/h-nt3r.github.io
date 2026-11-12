@@ -78,7 +78,7 @@
   const CLIPS = {
     // portrait:true = the base file is a tall render. wide:true = a landscape version also exists as NN-wide.mp4
     // (used on landscape screens, so tall renders aren't cropped and blown up on desktop).
-    '01':{portrait:true,  wide:false}, '04':{portrait:true,  wide:false},
+    '01':{portrait:true,  wide:true}, '04':{portrait:true,  wide:false},
     '02':{portrait:false}, '03':{portrait:false},
     '05':{portrait:false}, '07':{portrait:false}
   };
@@ -101,7 +101,7 @@
   } else {
     id = CONFIG.locked;
   }
-  const VER = '5'; // bump when clips are re-rendered so browsers don't serve stale cached files
+  const VER = '6'; // bump when clips are re-rendered so browsers don't serve stale cached files
   const bg = document.querySelector('.bg'), v = document.getElementById('bgv');
   const useWide = innerWidth > innerHeight && CLIPS[id].wide;
   const name = id + (useWide ? '-wide' : '');
